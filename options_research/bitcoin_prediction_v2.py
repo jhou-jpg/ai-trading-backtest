@@ -181,9 +181,9 @@ if __name__ == "__main__":
     print("BITCOIN V2 - SCALED UP")
     print("="*60)
     
-    # Get more data
-    print("\nDownloading Bitcoin data (3 years)...")
-    btc = get_bitcoin_data("3y", "1h")
+    # Get data - Yahoo only allows 2 years for hourly
+    print("\nDownloading Bitcoin data (max 2 years for hourly)...")
+    btc = get_bitcoin_data("2y", "1h")
     print(f"Got {len(btc)} hourly data points")
     
     # Create features
