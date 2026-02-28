@@ -5,7 +5,7 @@ strategy("AI Trading System - Multi Strategy", overlay=true, default_qty_type=st
 // STRATEGY SELECTION
 // ============================================================
 
-strategySelect = input.string(title="Strategy", defval="Combo", options=["SMA_Crossover", "EMA_Crossover", "RSI", "MACD", "Bollinger", "Momentum", "Mean_Reversion", "Stochastic", "Breakout", "ADX", "Combo"])
+strategySelect = input.string(title="Strategy", defval="SMA_Crossover", options=["SMA_Crossover", "EMA_Crossover", "RSI", "MACD", "Bollinger", "Momentum", "Mean_Reversion", "Stochastic", "Breakout", "ADX", "Combo"])
 
 // ============================================================
 // PARAMETERS
@@ -19,7 +19,7 @@ rsiOversold = input.int(title="RSI Oversold", defval=30, minval=0, maxval=50)
 // MACD Parameters
 macdFast = input.int(title="MACD Fast", defval=12, minval=1)
 macdSlow = input.int(title="MACD Slow", defval=26, minval=1)
-macdSignal = input.int(title="MACD Signal", defval=9, minval=1)
+macdSignalParam = input.int(title="MACD Signal", defval=9, minval=1)
 
 // Bollinger Parameters
 bbLength = input.int(title="BB Length", defval=20, minval=1)
@@ -62,10 +62,10 @@ takeProfitPct = input.float(title="Take Profit %", defval=15.0, minval=0.1, step
 // ============================================================
 
 // RSI
-rsi = ta.rsi(close, rsiPeriod)
+rsiValue = ta.rsi(close, rsiPeriod)
 
 // MACD
-[macdLine, signalLine, hist] = ta.macd(close, macdFast, macdSlow, macdSignal)
+[macdLine, signalLine, hist] = ta.macd(close, macdFast, macdSlow, macdSignalParam)
 
 // Bollinger Bands
 bbUpper = ta.sma(close, bbLength) + ta.stdev(close, bbLength) * bbStd
@@ -77,18 +77,18 @@ sma20 = ta.sma(close, smaShort)
 sma50 = ta.sma(close, smaLong)
 
 // EMAs
-ema12 = ta.ema(close, emaFast)
-ema26 = ta.ema(close, emaSlow)
+ema12Val = ta.ema(close, emaFast)
+ema26Val = ta.ema(close, emaSlow)
 
 // Momentum
-momentum = ta.mom(close, momentumPeriod)
+momentumVal = ta.mom(close, momentumPeriod)
 
 // Mean Reversion
 mrMA = ta.sma(close, mrLength)
-mrStd = ta.stdev(close, mrLength)
-mrUpper = mrMA + mrStd * mrStdMult
-mrLower = mrMA - mrStd * mrStdMult
-zScore = (close - mrMA) / mrStd
+mrStdDev = ta.stdev(close, mrLength)
+mrUpper = mrMA + mrStdDev * mrStdMult
+mrLower = mrMA - mrStdDev * mrStdMult
+zScore = (close - mrMA) / mrStdDev
 
 // Stochastic
 stochKVal = ta.stoch(close, high, low, stochK)
@@ -105,20 +105,23 @@ lowestLow = ta.lowest(low, breakoutLength)
 // SIGNALS
 // ============================================================
 
-buySignal = false
-sellSignal = false
+var bool buySignal = false
+var bool sellSignal = false
+
+buySignal := false
+sellSignal := false
 
 if strategySelect == "SMA_Crossover"
     buySignal := ta.crossover(sma20, sma50)
     sellSignal := ta.crossunder(sma20, sma50)
     
 else if strategySelect == "EMA_Crossover"
-    buySignal := ta.crossover(ema12, ema26)
-    sellSignal := ta.crossunder(ema12, ema26)
+    buySignal := ta.crossover(ema12Val, ema26Val)
+    sellSignal := ta.crossunder(ema12Val, ema26Val)
     
 else if strategySelect == "RSI"
-    buySignal := rsi < rsiOversold
-    sellSignal := rsi > rsiOverbought
+    buySignal := rsiValue < rsiOversold
+    sellSignal := rsiValue > rsiOverbought
     
 else if strategySelect == "MACD"
     buySignal := ta.crossover(macdLine, signalLine)
@@ -129,8 +132,8 @@ else if strategySelect == "Bollinger"
     sellSignal := close > bbUpper
     
 else if strategySelect == "Momentum"
-    buySignal := momentum > 0
-    sellSignal := momentum < 0
+    buySignal := momentumVal > 0
+    sellSignal := momentumVal < 0
     
 else if strategySelect == "Mean_Reversion"
     buySignal := zScore < -mrStdMult
@@ -149,32 +152,24 @@ else if strategySelect == "ADX"
     sellSignal := adx > adxThreshold and minusDI > plusDI
     
 else if strategySelect == "Combo"
-    // Combined: SMA trend + RSI + MACD
-    smaTrend = sma20 > sma50 ? 1 : -1
-    rsiSignal = rsi < 40 ? 1 : (rsi > 60 ? -1 : 0)
-    macdSignalVal = macdLine > signalLine ? 1 : (macdLine < signalLine ? -1 : 0)
-    combined = (smaTrend + rsiSignal + macdSignalVal) / 3
-    buySignal := combined > 0.3
-    sellSignal := combined < -0.3
+    smaTrend = sma20 > sma50 ? 1.0 : -1.0
+    rsiSig = rsiValue < 40.0 ? 1.0 : (rsiValue > 60.0 ? -1.0 : 0.0)
+    macdSig = macdLine > signalLine ? 1.0 : (macdLine < signalLine ? -1.0 : 0.0)
+    combinedVal = (smaTrend + rsiSig + macdSig) / 3.0
+    buySignal := combinedVal > 0.3
+    sellSignal := combinedVal < -0.3
 
 // ============================================================
 // PLOTTING
 // ============================================================
 
-// Plot SMAs
 plot(sma20, color=color.blue, title="SMA 20")
 plot(sma50, color=color.orange, title="SMA 50")
-
-// Plot Bollinger
 plot(bbUpper, color=color.gray, title="BB Upper")
 plot(bbMiddle, color=color.gray, title="BB Middle")
 plot(bbLower, color=color.gray, title="BB Lower")
-
-// Plot MACD Histogram
 plot(hist, color=hist >= 0 ? color.green : color.red, style=plot.style_histogram, title="MACD Hist")
-
-// RSI Line
-plot(rsi, color=color.purple, title="RSI")
+plot(rsiValue, color=color.purple, title="RSI")
 hline(rsiOverbought, color=color.red, linestyle=hline.dashed, title="Overbought")
 hline(rsiOversold, color=color.green, linestyle=hline.dashed, title="Oversold")
 
@@ -182,48 +177,20 @@ hline(rsiOversold, color=color.green, linestyle=hline.dashed, title="Oversold")
 // EXECUTION
 // ============================================================
 
-if (buySignal)
+if buySignal
     stopPrice = close * (1 - stopLossPct)
     takePrice = close * (1 + takeProfitPct)
     strategy.entry(id="Buy", direction=strategy.long)
     strategy.exit(id="Buy Exit", stop=stopPrice, limit=takePrice)
 
-if (sellSignal)
+if sellSignal
     strategy.close(id="Buy")
 
 // ============================================================
-// BACKTEST INFO
+// BACKTEST SUMMARY (Simple)
 // ============================================================
 
-// Get strategy stats
-equityCurve = strategy.equity
-totalTrades = strategy.closedtrades
-winningTrades = strategy.wontrades
-losingTrades = strategy.losttrades
-winRate = totalTrades > 0 ? (winningTrades / totalTrades) * 100 : 0
-avgWin = strategy.avgwin
-avgLoss = strategy.avgloss
-profitFactor = avgLoss != 0 ? math.abs(avgWin / avgLoss) : 0
-maxDrawdown = strategy.maxdrawdown
-totalReturn = (equityCurve - strategy.initial_equity) / strategy.initial_equity * 100
+var int totalTrades = strategy.closedtrades
+var float totalReturn = (strategy.equity - strategy.initial_equity) / strategy.initial_equity * 100
 
-// Info Table
-var table infoTable = table.new(position.bottom_right, 2, 10, frame=color.gray, frame_width=1)
-if barstate.islast
-    table.cell(infoTable, 0, 0, "Total Trades", text_color=color.white, bgcolor=color.gray)
-    table.cell(infoTable, 1, 0, str.tostring(totalTrades), text_color=color.white, bgcolor=color.gray)
-    table.cell(infoTable, 0, 1, "Win Rate", text_color=color.white, bgcolor=color.gray)
-    table.cell(infoTable, 1, 1, str.tostring(winRate, "#.##") + "%", text_color=color.white, bgcolor=color.gray)
-    table.cell(infoTable, 0, 2, "Profit Factor", text_color=color.white, bgcolor=color.gray)
-    table.cell(infoTable, 1, 2, str.tostring(profitFactor, "#.##"), text_color=color.white, bgcolor=color.gray)
-    table.cell(infoTable, 0, 3, "Max Drawdown", text_color=color.white, bgcolor=color.gray)
-    table.cell(infoTable, 1, 3, str.tostring(maxDrawdown, "#.##") + "%", text_color=color.white, bgcolor=color.gray)
-    table.cell(infoTable, 0, 4, "Total Return", text_color=color.white, bgcolor=color.gray)
-    table.cell(infoTable, 1, 4, str.tostring(totalReturn, "#.##") + "%", text_color=color.white, bgcolor=color.gray)
-
-// ============================================================
-// ALERTS
-// ============================================================
-
-alertcondition(buySignal, title="Buy Signal", message="Buy Signal for {{ticker}}")
-alertcondition(sellSignal, title="Sell Signal", message="Sell Signal for {{ticker}}")
+plot(strategy.equity, title="Equity", color=color.green, linewidth=2)
