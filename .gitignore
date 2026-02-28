@@ -48,6 +48,9 @@ Thumbs.db
 *api_key*
 *secret*
 *password*
+secrets.json
+credentials.json
+.env
 *.pem
 *.key
 *credentials*
