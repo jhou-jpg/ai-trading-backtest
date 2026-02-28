@@ -50,7 +50,8 @@ Thumbs.db
 *password*
 secrets.json
 credentials.json
-.env
+_secrets.py
+*.env
 *.pem
 *.key
 *credentials*
