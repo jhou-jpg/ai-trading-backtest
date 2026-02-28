@@ -173,8 +173,35 @@ def trade_signal(client: KalshiClient, market_ticker: str,
 if __name__ == "__main__":
     # Your API credentials from kalshi.com
     # Get from: Settings -> API
-    API_KEY = "6f1d007c-3933-40bd-b570-bb7806f4c8ac"
-    API_SECRET = "YOUR_API_SECRET_HERE"  # <-- Replace with your secret
+    API_KEY = "e93f0457-b619-4601-a3a0-63efd1a333dd"
+    API_SECRET = "-----BEGIN RSA PRIVATE KEY----- \
+MIIEpAIBAAKCAQEAyTtc/oYTIPdhwLesuaezcxGZZbeIVc7E5ogMM5eSpD4sAbLc \
+3pv+RExI/r9foY8+WvKv3AOrd5qMg0Tn4PNpoOfTaAk0NiPY17fRS2662YxCMmOD \
+DZHkZR76gWiIa4cZeybycabVXuMt7MwPND9onO/z29qmoAsMkT1noIBaIWlh/mdI \
+jrzM+uI0ffjTEpmWmy5KDQTrcpYujDW+ylbnuXIaDZK1LxggjKklgoAYeeJ11QLD \
+nipIiJb5/iHxsPNTLRzkV7i9QEn5hU5e7YfRU5L9wr9epCKICVvCcbiYObmbKZOW \
+WU2YnJGwMsvn8lJKUdBuCh/IlRwBaxAUncH1swIDAQABAoIBACD4/6da67Z6ooNT \
+9VLkZjSEHTj8BjRdMYk+oJUxkF8mKsrKdoNpVxP01f8b93z+/i4j1un7lfR+l+iI \
+eWA0MkohwlOpMmtum0DZh0tPZQFxiIU+JgKqtZxWI6DhsnzAAc5alt5Fgm/OVL+Y \
+viMHAsq4TKJpJOVTeicwQxMbBOm1Urfcvnbbo7WbQe5hLt+L/DWrGb14/wQTJJlo \
+o31VZ7Hpwm/kvTG8dCM42l6fZ1txAC2M7AH8wJcg3Wx/1zp1WPNppMEdqT1rZpPH \
+uD1sjphO0sxD+eJkjQIUmPvE5sOj2yDo+lIAc+ROiXZHj/WdNfD4TZHNr5PLfDmk \
+MtI8o60CgYEA0nUT/WQVoZP2Ta4smQ4OhBNlh6rHrqPXm4pBzxibPpfr36NQu68H \
+5oQ5C9VTEM1z0EpMDXb7T8L11kc1thEKbRQws3pmH+MEEgZl6uV7sJ0SwkUeAxKG \
+1VgDcml+MiSE75CO6mmMH9ELemy+zqzsSfUyYMifLtA6cxdm2Kt8qGcCgYEA9Mc2 \
+p5b6Hgi+mATfo0mMyF/GMuFhnedtKIoVGXMiFhHWzBUZVpHwf9e11BoCJ7q6M/Uh \
+c4kuaOE/n3r10qcDGb1FA0Dj5VJjEmoTwdP8obYfFYY3x/U/KuNems7KKWwfHO+i \
+6ZX7VS9CIUzHfmTTo0Ov+mV1RJE7PVE7NDxgaNUCgYEAhwwFxcWhc8uEc5hemeBB \
+RFNGBWZ7N/9+7Ros3H2HsQS/oQQlXCoWwb769DLxWIjd1jy2zLUa0rXiFpwfRTNu \
+I0yfa6wROEjuZbqhT7fuRQil7u93MLWEvAX8QECdcAOrIib67kTIW+pCmU6Kqgig \
+n1yt9RkHvHx15UCRCFwSY+UCgYBQ+kqxfLf4EaqD/jDCA0YIz+5wzLEPnQ02uR+r \
+0LP5GyO1VlGQmy02DfXAWm5WGGcbY0ASydJJriLvLq1+Z/QVotDe96utJOlToTYy \
+DGBqWybDZyizBQZFuPyGOF0XAQb1+q0pm42PK9gzzgO9Y7vEKlNgggoeifFQIrx0 \
+VnkKlQKBgQCIgPfgPG9KBEJOWRQri1PvP25tUmcN7s7JADu31TkiY/sPuLBLEnuw \
+gUsfgnCMOBRfFxMrjuD1k9eM+x2iFBXhGAPNXV0ICM0Wvm+xxKGU9zlrd7ZUC4u6 \
+B15s6p7c4BsCzGIlWL2lL1+I5SEgrwCdUiQlRrBdxA/izi6iY/sOEg== \
+-----END RSA PRIVATE KEY-----
+"  # <-- Replace with your secret
     
     print("="*60)
     print("KALSHI INTEGRATION")
