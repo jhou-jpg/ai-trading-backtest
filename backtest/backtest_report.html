@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>AI Trading System - Backtest Results</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 40px; background: #0f0f0f; color: #e0e0e0; }
+        h1 { color: #00d4aa; border-bottom: 2px solid #00d4aa; padding-bottom: 10px; }
+        h2 { color: #00d4aa; margin-top: 30px; }
+        .summary { background: #1a1a1a; padding: 20px; border-radius: 10px; margin: 20px 0; }
+        .stat { display: inline-block; margin: 10px 20px 10px 0; }
+        .stat-value { font-size: 24px; font-weight: bold; color: #00d4aa; }
+        .stat-label { font-size: 12px; color: #888; }
+        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+        th { background: #1a1a1a; padding: 12px; text-align: left; color: #00d4aa; }
+        td { padding: 10px 12px; border-bottom: 1px solid #333; }
+        tr:hover { background: #1a1a1a; }
+        .positive { color: #00d4aa; }
+        .negative { color: #ff4757; }
+        .best { background: #1a2a1a; }
+        .instructions { background: #1a1a1a; padding: 20px; border-radius: 10px; }
+        code { background: #333; padding: 2px 6px; border-radius: 4px; font-family: monospace; }
+        .btn { display: inline-block; background: #00d4aa; color: #000; padding: 10px 20px; text-decoration: none; border-radius: 5px; margin: 5px; }
+    </style>
+</head>
+<body>
+    <h1>🤖 AI Trading System - Backtest Results</h1>
+    <p>Period: Feb 2025 - Feb 2026 (1 Year)</p>
+    
+    <div class="summary">
+        <h2>📊 Top Performers</h2>
+        <div class="stat">
+            <div class="stat-value">+84.5%</div>
+            <div class="stat-label">Best Return (GOOGL SMA)</div>
+        </div>
+        <div class="stat">
+            <div class="stat-value">42.8%</div>
+            <div class="stat-label">Best Annual (NVDA Momentum)</div>
+        </div>
+        <div class="stat">
+            <div class="stat-value">-6.8%</div>
+            <div class="stat-label">Best Drawdown (MSFT)</div>
+        </div>
+    </div>
+
+    <h2>📈 All Backtest Results</h2>
+    <table>
+        <tr>
+            <th>Ticker</th>
+            <th>Strategy</th>
+            <th>Return %</th>
+            <th>Annual %</th>
+            <th>Max Drawdown %</th>
+            <th>Trades</th>
+        </tr>
+        <tr class="best">
+            <td>GOOGL</td><td>SMA Crossover</td><td class="positive">+84.50%</td><td>+122.87%</td><td>-12.11%</td><td>2</td>
+        </tr>
+        <tr class="best">
+            <td>NVDA</td><td>Momentum</td><td class="positive">+42.81%</td><td>+62.25%</td><td>-12.54%</td><td>18</td>
+        </tr>
+        <tr>
+            <td>GOOGL</td><td>MACD</td><td class="positive">+33.93%</td><td>+49.34%</td><td>-10.77%</td><td>22</td>
+        </tr>
+        <tr>
+            <td>MSFT</td><td>Momentum</td><td class="positive">+21.12%</td><td>+30.71%</td><td>-6.83%</td><td>18</td>
+        </tr>
+        <tr>
+            <td>AAPL</td><td>SMA Crossover</td><td class="positive">+18.93%</td><td>+27.53%</td><td>-9.87%</td><td>5</td>
+        </tr>
+        <tr>
+            <td>AAPL</td><td>Momentum</td><td class="positive">+16.22%</td><td>+23.58%</td><td>-10.24%</td><td>14</td>
+        </tr>
+        <tr>
+            <td>NVDA</td><td>SMA Crossover</td><td class="positive">+14.56%</td><td>+21.18%</td><td>-19.44%</td><td>5</td>
+        </tr>
+        <tr>
+            <td>TSLA</td><td>SMA Crossover</td><td class="positive">+5.94%</td><td>+8.64%</td><td>-24.86%</td><td>4</td>
+        </tr>
+        <tr>
+            <td>TSLA</td><td>MACD</td><td class="positive">+2.43%</td><td>+3.53%</td><td>-22.27%</td><td>23</td>
+        </tr>
+        <tr>
+            <td>MSFT</td><td>SMA Crossover</td><td class="negative">-7.33%</td><td>-10.66%</td><td>-10.17%</td><td>2</td>
+        </tr>
+        <tr>
+            <td>NVDA</td><td>MACD</td><td class="negative">-8.04%</td><td>-11.70%</td><td>-22.53%</td><td>22</td>
+        </tr>
+        <tr>
+            <td>AAPL</td><td>MACD</td><td class="negative">-19.24%</td><td>-27.97%</td><td>-24.18%</td><td>23</td>
+        </tr>
+        <tr>
+            <td>MSFT</td><td>MACD</td><td class="negative">-19.77%</td><td>-28.74%</td><td>-23.69%</td><td>23</td>
+        </tr>
+        <tr>
+            <td>TSLA</td><td>Momentum</td><td class="negative">-22.06%</td><td>-32.08%</td><td>-38.81%</td><td>32</td>
+        </tr>
+    </table>
+
+    <h2>🏆 Best Strategy Per Stock</h2>
+    <table>
+        <tr><th>Stock</th><th>Best Strategy</th><th>Return</th><th>Risk (DD)</th></tr>
+        <tr><td>GOOGL</td><td>SMA Crossover</td><td class="positive">+84.5%</td><td>-12.1%</td></tr>
+        <tr><td>NVDA</td><td>Momentum</td><td class="positive">+42.8%</td><td>-12.5%</td></tr>
+        <tr><td>MSFT</td><td>Momentum</td><td class="positive">+21.1%</td><td>-6.8%</td></tr>
+        <tr><td>AAPL</td><td>SMA Crossover</td><td class="positive">+18.9%</td><td>-9.9%</td></tr>
+        <tr><td>TSLA</td><td>SMA Crossover</td><td class="positive">+5.9%</td><td>-24.9%</td></tr>
+    </table>
+
+    <h2>🔧 Use in TradingView</h2>
+    <div class="instructions">
+        <p>1. Open <a href="https://www.tradingview.com/" style="color: #00d4aa;">TradingView</a></p>
+        <p>2. Create new Pine Script: <code>File → New → Pine Script</code></p>
+        <p>3. Copy code from <code>tradingview_pinescript.txt</code></p>
+        <p>4. Add to chart and configure strategy in settings</p>
+        <p>5. Enable paper trading to test signals</p>
+    </div>
+
+    <h2>📁 Files</h2>
+    <p>
+        <a class="btn" href="https://github.com/jhou-jpg/ai-trading-backtest">GitHub Repo</a>
+    </p>
+    <p><small>Generated: Feb 2026 | Framework: Python + Yahoo Finance</small></p>
+</body>
+</html>

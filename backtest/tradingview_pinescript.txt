@@ -1,0 +1,229 @@
+//@version=5
+strategy("AI Trading System - Multi Strategy", overlay=true, default_qty_type=strategy.percent_of_equity, default_qty_value=10)
+
+// ============================================================
+// STRATEGY SELECTION
+// ============================================================
+
+strategySelect = input.string(title="Strategy", defval="Combo", options=["SMA_Crossover", "EMA_Crossover", "RSI", "MACD", "Bollinger", "Momentum", "Mean_Reversion", "Stochastic", "Breakout", "ADX", "Combo"])
+
+// ============================================================
+// PARAMETERS
+// ============================================================
+
+// RSI Parameters
+rsiPeriod = input.int(title="RSI Period", defval=14, minval=1)
+rsiOverbought = input.int(title="RSI Overbought", defval=70, minval=50, maxval=100)
+rsiOversold = input.int(title="RSI Oversold", defval=30, minval=0, maxval=50)
+
+// MACD Parameters
+macdFast = input.int(title="MACD Fast", defval=12, minval=1)
+macdSlow = input.int(title="MACD Slow", defval=26, minval=1)
+macdSignal = input.int(title="MACD Signal", defval=9, minval=1)
+
+// Bollinger Parameters
+bbLength = input.int(title="BB Length", defval=20, minval=1)
+bbStd = input.float(title="BB Std Dev", defval=2.0, minval=0.1, step=0.1)
+
+// SMA Parameters
+smaShort = input.int(title="SMA Short", defval=20, minval=1)
+smaLong = input.int(title="SMA Long", defval=50, minval=1)
+
+// EMA Parameters
+emaFast = input.int(title="EMA Fast", defval=12, minval=1)
+emaSlow = input.int(title="EMA Slow", defval=26, minval=1)
+
+// Momentum Parameters
+momentumPeriod = input.int(title="Momentum Period", defval=20, minval=1)
+
+// Mean Reversion Parameters
+mrLength = input.int(title="MR Length", defval=20, minval=1)
+mrStdMult = input.float(title="MR Std Multiplier", defval=2.0, minval=0.1, step=0.1)
+
+// Stochastic Parameters
+stochK = input.int(title="Stoch K", defval=14, minval=1)
+stochD = input.int(title="Stoch D", defval=3, minval=1)
+stochOverbought = input.int(title="Stoch Overbought", defval=80, minval=50, maxval=100)
+stochOversold = input.int(title="Stoch Oversold", defval=20, minval=0, maxval=50)
+
+// Breakout Parameters
+breakoutLength = input.int(title="Breakout Length", defval=20, minval=1)
+
+// ADX Parameters
+adxPeriod = input.int(title="ADX Period", defval=14, minval=1)
+adxThreshold = input.int(title="ADX Threshold", defval=25, minval=1)
+
+// Risk Management
+stopLossPct = input.float(title="Stop Loss %", defval=10.0, minval=0.1, step=0.1) / 100
+takeProfitPct = input.float(title="Take Profit %", defval=15.0, minval=0.1, step=0.1) / 100
+
+// ============================================================
+// INDICATORS
+// ============================================================
+
+// RSI
+rsi = ta.rsi(close, rsiPeriod)
+
+// MACD
+[macdLine, signalLine, hist] = ta.macd(close, macdFast, macdSlow, macdSignal)
+
+// Bollinger Bands
+bbUpper = ta.sma(close, bbLength) + ta.stdev(close, bbLength) * bbStd
+bbMiddle = ta.sma(close, bbLength)
+bbLower = ta.sma(close, bbLength) - ta.stdev(close, bbLength) * bbStd
+
+// SMAs
+sma20 = ta.sma(close, smaShort)
+sma50 = ta.sma(close, smaLong)
+
+// EMAs
+ema12 = ta.ema(close, emaFast)
+ema26 = ta.ema(close, emaSlow)
+
+// Momentum
+momentum = ta.mom(close, momentumPeriod)
+
+// Mean Reversion
+mrMA = ta.sma(close, mrLength)
+mrStd = ta.stdev(close, mrLength)
+mrUpper = mrMA + mrStd * mrStdMult
+mrLower = mrMA - mrStd * mrStdMult
+zScore = (close - mrMA) / mrStd
+
+// Stochastic
+stochKVal = ta.stoch(close, high, low, stochK)
+stochDVal = ta.sma(stochKVal, stochD)
+
+// Breakout
+highestHigh = ta.highest(high, breakoutLength)
+lowestLow = ta.lowest(low, breakoutLength)
+
+// ADX
+[adx, plusDI, minusDI] = ta.dmi(adxPeriod, adxPeriod)
+
+// ============================================================
+// SIGNALS
+// ============================================================
+
+buySignal = false
+sellSignal = false
+
+if strategySelect == "SMA_Crossover"
+    buySignal := ta.crossover(sma20, sma50)
+    sellSignal := ta.crossunder(sma20, sma50)
+    
+else if strategySelect == "EMA_Crossover"
+    buySignal := ta.crossover(ema12, ema26)
+    sellSignal := ta.crossunder(ema12, ema26)
+    
+else if strategySelect == "RSI"
+    buySignal := rsi < rsiOversold
+    sellSignal := rsi > rsiOverbought
+    
+else if strategySelect == "MACD"
+    buySignal := ta.crossover(macdLine, signalLine)
+    sellSignal := ta.crossunder(macdLine, signalLine)
+    
+else if strategySelect == "Bollinger"
+    buySignal := close < bbLower
+    sellSignal := close > bbUpper
+    
+else if strategySelect == "Momentum"
+    buySignal := momentum > 0
+    sellSignal := momentum < 0
+    
+else if strategySelect == "Mean_Reversion"
+    buySignal := zScore < -mrStdMult
+    sellSignal := zScore > mrStdMult
+    
+else if strategySelect == "Stochastic"
+    buySignal := stochKVal < stochOversold
+    sellSignal := stochKVal > stochOverbought
+    
+else if strategySelect == "Breakout"
+    buySignal := close > highestHigh[1]
+    sellSignal := close < lowestLow[1]
+    
+else if strategySelect == "ADX"
+    buySignal := adx > adxThreshold and plusDI > minusDI
+    sellSignal := adx > adxThreshold and minusDI > plusDI
+    
+else if strategySelect == "Combo"
+    // Combined: SMA trend + RSI + MACD
+    smaTrend = sma20 > sma50 ? 1 : -1
+    rsiSignal = rsi < 40 ? 1 : (rsi > 60 ? -1 : 0)
+    macdSignalVal = macdLine > signalLine ? 1 : (macdLine < signalLine ? -1 : 0)
+    combined = (smaTrend + rsiSignal + macdSignalVal) / 3
+    buySignal := combined > 0.3
+    sellSignal := combined < -0.3
+
+// ============================================================
+// PLOTTING
+// ============================================================
+
+// Plot SMAs
+plot(sma20, color=color.blue, title="SMA 20")
+plot(sma50, color=color.orange, title="SMA 50")
+
+// Plot Bollinger
+plot(bbUpper, color=color.gray, title="BB Upper")
+plot(bbMiddle, color=color.gray, title="BB Middle")
+plot(bbLower, color=color.gray, title="BB Lower")
+
+// Plot MACD Histogram
+plot(hist, color=hist >= 0 ? color.green : color.red, style=plot.style_histogram, title="MACD Hist")
+
+// RSI Line
+plot(rsi, color=color.purple, title="RSI")
+hline(rsiOverbought, color=color.red, linestyle=hline.dashed, title="Overbought")
+hline(rsiOversold, color=color.green, linestyle=hline.dashed, title="Oversold")
+
+// ============================================================
+// EXECUTION
+// ============================================================
+
+if (buySignal)
+    stopPrice = close * (1 - stopLossPct)
+    takePrice = close * (1 + takeProfitPct)
+    strategy.entry(id="Buy", direction=strategy.long)
+    strategy.exit(id="Buy Exit", stop=stopPrice, limit=takePrice)
+
+if (sellSignal)
+    strategy.close(id="Buy")
+
+// ============================================================
+// BACKTEST INFO
+// ============================================================
+
+// Get strategy stats
+equityCurve = strategy.equity
+totalTrades = strategy.closedtrades
+winningTrades = strategy.wontrades
+losingTrades = strategy.losttrades
+winRate = totalTrades > 0 ? (winningTrades / totalTrades) * 100 : 0
+avgWin = strategy.avgwin
+avgLoss = strategy.avgloss
+profitFactor = avgLoss != 0 ? math.abs(avgWin / avgLoss) : 0
+maxDrawdown = strategy.maxdrawdown
+totalReturn = (equityCurve - strategy.initial_equity) / strategy.initial_equity * 100
+
+// Info Table
+var table infoTable = table.new(position.bottom_right, 2, 10, frame=color.gray, frame_width=1)
+if barstate.islast
+    table.cell(infoTable, 0, 0, "Total Trades", text_color=color.white, bgcolor=color.gray)
+    table.cell(infoTable, 1, 0, str.tostring(totalTrades), text_color=color.white, bgcolor=color.gray)
+    table.cell(infoTable, 0, 1, "Win Rate", text_color=color.white, bgcolor=color.gray)
+    table.cell(infoTable, 1, 1, str.tostring(winRate, "#.##") + "%", text_color=color.white, bgcolor=color.gray)
+    table.cell(infoTable, 0, 2, "Profit Factor", text_color=color.white, bgcolor=color.gray)
+    table.cell(infoTable, 1, 2, str.tostring(profitFactor, "#.##"), text_color=color.white, bgcolor=color.gray)
+    table.cell(infoTable, 0, 3, "Max Drawdown", text_color=color.white, bgcolor=color.gray)
+    table.cell(infoTable, 1, 3, str.tostring(maxDrawdown, "#.##") + "%", text_color=color.white, bgcolor=color.gray)
+    table.cell(infoTable, 0, 4, "Total Return", text_color=color.white, bgcolor=color.gray)
+    table.cell(infoTable, 1, 4, str.tostring(totalReturn, "#.##") + "%", text_color=color.white, bgcolor=color.gray)
+
+// ============================================================
+// ALERTS
+// ============================================================
+
+alertcondition(buySignal, title="Buy Signal", message="Buy Signal for {{ticker}}")
+alertcondition(sellSignal, title="Sell Signal", message="Sell Signal for {{ticker}}")
